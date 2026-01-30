@@ -1,0 +1,443 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+#canvas {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+#connections {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+#connections line {
+    stroke: #e94560;
+    stroke-width: 2;
+    stroke-dasharray: 5, 5;
+    opacity: 0.7;
+}
+
+/* Animal Card */
+.animal-card {
+    position: absolute;
+    width: 180px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    padding: 12px;
+    cursor: grab;
+    user-select: none;
+    z-index: 10;
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.animal-card:hover {
+    box-shadow: 0 8px 32px rgba(233, 69, 96, 0.3);
+}
+
+.animal-card.dragging {
+    cursor: grabbing;
+    z-index: 100;
+    transform: scale(1.05);
+}
+
+.animal-card.selected {
+    border-color: #e94560;
+    box-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+}
+
+.animal-card img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Loading card */
+.animal-card.loading-card {
+    pointer-events: auto;
+}
+
+.animal-card .card-loader {
+    width: 100%;
+    height: 140px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.animal-card .card-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #e94560;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.animal-card .loading-name {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.animal-card .name {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 8px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.animal-card .generation {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 10px;
+    text-align: center;
+    margin-top: 4px;
+}
+
+/* Add Button */
+#add-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(233, 69, 96, 0.5);
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 1000;
+}
+
+#add-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(233, 69, 96, 0.7);
+}
+
+/* Breed Button */
+#breed-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 110px;
+    padding: 15px 25px;
+    border-radius: 30px;
+    border: none;
+    background: linear-gradient(135deg, #7b2cbf, #9d4edd);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(157, 78, 221, 0.5);
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+    z-index: 1000;
+}
+
+#breed-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 30px rgba(157, 78, 221, 0.7);
+}
+
+#breed-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Modal */
+#modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    transition: opacity 0.3s;
+}
+
+#modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    background: rgba(30, 30, 50, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 90%;
+    max-width: 400px;
+}
+
+.modal-content h2 {
+    color: white;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.input-row {
+    display: flex;
+    gap: 10px;
+}
+
+.modal-content input {
+    flex: 1;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#random-btn {
+    width: 50px;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 20px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+#random-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.05);
+}
+
+#random-btn:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+.modal-content input:focus {
+    border-color: #e94560;
+}
+
+.modal-content input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.modal-buttons button:hover {
+    transform: scale(1.02);
+}
+
+#cancel-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+#create-btn {
+    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    color: white;
+}
+
+/* Loading */
+#loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    transition: opacity 0.3s;
+}
+
+#loading.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#loading p {
+    color: white;
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #e94560;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Breeding animation */
+@keyframes pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+.breeding-line {
+    animation: pulse 0.5s ease-in-out infinite;
+}
+
+/* Card buttons */
+.animal-card .breed-link-btn,
+.animal-card .zoom-btn {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.animal-card:hover .breed-link-btn,
+.animal-card:hover .zoom-btn {
+    opacity: 1;
+}
+
+.animal-card .breed-link-btn {
+    top: 8px;
+    right: 8px;
+    background: rgba(157, 78, 221, 0.8);
+    color: white;
+}
+
+.animal-card .zoom-btn {
+    top: 8px;
+    left: 8px;
+    background: rgba(233, 69, 96, 0.8);
+    color: white;
+}
+
+.animal-card .breed-link-btn:hover,
+.animal-card .zoom-btn:hover {
+    transform: scale(1.1);
+}
+
+.animal-card.breed-mode {
+    border-color: #9d4edd;
+    box-shadow: 0 0 25px rgba(157, 78, 221, 0.7);
+    animation: breed-pulse 1s ease-in-out infinite;
+}
+
+@keyframes breed-pulse {
+    0%, 100% { box-shadow: 0 0 25px rgba(157, 78, 221, 0.5); }
+    50% { box-shadow: 0 0 35px rgba(157, 78, 221, 0.9); }
+}
+
+/* Name input */
+.name-input {
+    width: 100%;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #e94560;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+}
+
+.animal-card .name {
+    cursor: text;
+}
+
+/* Lightbox */
+#lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4000;
+    cursor: zoom-out;
+    transition: opacity 0.3s;
+}
+
+#lightbox.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#lightbox img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 16px;
+    box-shadow: 0 0 50px rgba(233, 69, 96, 0.5);
+}
+
+#lightbox .lightbox-name {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}

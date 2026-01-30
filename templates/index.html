@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolution Lab</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="canvas">
+        <!-- SVG layer for connection lines -->
+        <svg id="connections"></svg>
+
+        <!-- Animal cards will be added here dynamically -->
+    </div>
+
+    <!-- Add new animal button -->
+    <button id="add-btn" title="Create new creature">+</button>
+
+    <!-- Breed button (appears when two cards are selected) -->
+    <button id="breed-btn" class="hidden" title="Breed selected creatures">Breed</button>
+
+    <!-- Prompt modal -->
+    <div id="modal" class="hidden">
+        <div class="modal-content">
+            <h2>Create a Creature</h2>
+            <div class="input-row">
+                <input type="text" id="prompt-input" placeholder="Describe your creature..." autofocus>
+                <button id="random-btn" title="Generate random creature idea">🎲</button>
+            </div>
+            <div class="modal-buttons">
+                <button id="cancel-btn">Cancel</button>
+                <button id="create-btn">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loading" class="hidden">
+        <div class="spinner"></div>
+        <p>Generating...</p>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="hidden">
+        <img src="" alt="">
+        <div class="lightbox-name"></div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
