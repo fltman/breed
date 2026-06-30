@@ -1,5 +1,7 @@
 # Breed - AI Image Generator
 
+[![Support me on Patreon](https://img.shields.io/badge/Patreon-Support%20my%20work-FF424D?style=flat&logo=patreon&logoColor=white)](https://www.patreon.com/AndersBjarby)
+
 Generate images using Google Gemini via OpenRouter API. Supports text-to-image, image-to-image, and image "breeding" (combining two images).
 
 ## Features
